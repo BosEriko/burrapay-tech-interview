@@ -17,8 +17,13 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
       createTournament(name),
       E.fold(
         (error) => reply.status(400).send({ error }),
-        (success) => {
-          return reply.status(201).send(success)
+        (tournament) => {
+          const response: TournamentResponse = {
+            id: tournament.id,
+            name: tournament.name,
+            createdAt: tournament.createdAt.toISOString()
+          }
+          return reply.status(201).send(response)
         }
       )
     )
