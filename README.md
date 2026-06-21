@@ -68,10 +68,10 @@ src/
 
 ### Task 1: Complete Tournament Routes (`src/routes/tournaments.ts`)
 
-- [ ] Implement `POST /tournaments` endpoint
-- [ ] Use the provided `fp-ts Either` pattern example
-- [ ] Return appropriate HTTP status codes (201 for success, 400 for errors)
-- [ ] Transform response to match `TournamentResponse` interface
+- [x] Implement `POST /tournaments` endpoint
+- [x] Use the provided `fp-ts Either` pattern example
+- [x] Return appropriate HTTP status codes (201 for success, 400 for errors)
+- [x] Transform response to match `TournamentResponse` interface
 
 ### Task 2: Complete Player Routes (`src/routes/players.ts`)
 
