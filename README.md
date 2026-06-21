@@ -76,7 +76,7 @@ src/
 ### Task 2: Complete Player Routes (`src/routes/players.ts`)
 
 - [x] Implement `POST /tournaments/:tournamentId/players` endpoint
-- [ ] Validate tournament exists before adding player
+- [x] Validate tournament exists before adding player
 - [ ] **Pokemon Validation**: Verify player name is a valid Pokemon using PokeAPI
 - [ ] **REJECT non-Pokemon names** with 400 Bad Request error
 - [ ] Use `fp-ts` patterns for async operations and error handling
