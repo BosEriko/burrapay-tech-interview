@@ -2,18 +2,21 @@ import { FastifyInstance } from 'fastify'
 import { pipe } from 'fp-ts/lib/function'
 import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
-import { CreateTournamentRequest, TournamentResponse } from '../types/index.ts'
+import { TournamentResponse } from '../types/index.ts'
 import { createTournament, getTournament, getAllTournaments } from '../storage/index.ts'
+import { CreateTournamentValidation, formatValidationErrors } from '../validation/index.ts'
 
 export async function tournamentRoutes(fastify: FastifyInstance) {
-  fastify.post<{ Body: CreateTournamentRequest, Reply: TournamentResponse | { error: string } }>('/tournaments', async (request, reply) => {
-    const { name } = request.body ?? {}
+  fastify.post<{ Body: { name: string }, Reply: TournamentResponse | { error: string } }>('/tournaments', async (request, reply) => {
+    const decoded = CreateTournamentValidation.decode(request.body)
 
-    if (typeof name !== 'string') {
-      const message = 'Name is required'
-      request.log.warn({ body: request.body }, message)
+    if (E.isLeft(decoded)) {
+      const message = formatValidationErrors(decoded.left)
+      request.log.warn({ body: request.body, errors: decoded.left }, message)
       return reply.status(400).send({ error: message })
     }
+
+    const { name } = decoded.right
 
     return pipe(
       createTournament(name),

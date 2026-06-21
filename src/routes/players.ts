@@ -2,20 +2,24 @@ import { FastifyInstance } from 'fastify'
 import { pipe } from 'fp-ts/lib/function'
 import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
-import { CreatePlayerRequest, Player, PlayerResponse, PokemonApiResponse } from '../types/index.ts'
+import { Player, PlayerResponse, PokemonApiResponse } from '../types/index.ts'
 import { createPlayer, getTournament, getPlayer, getAllPlayers, getPlayersByTournament } from '../storage/index.ts'
 import { fetchPokemon } from '../services/pokemon.ts'
+import { CreatePlayerValidation, formatValidationErrors } from '../validation/index.ts'
 
 export async function playerRoutes(fastify: FastifyInstance) {
-  fastify.post<{ Params: { tournamentId: string }, Body: CreatePlayerRequest, Reply: PlayerResponse | { error: string } }>('/tournaments/:tournamentId/players', async (request, reply) => {
+  fastify.post<{ Params: { tournamentId: string }, Body: { name: string }, Reply: PlayerResponse | { error: string } }>('/tournaments/:tournamentId/players', async (request, reply) => {
     const { tournamentId } = request.params
-    const { name } = request.body ?? {}
 
-    if (typeof name !== 'string') {
-      const message = 'Name is required'
-      request.log.warn({ body: request.body }, message)
+    const decoded = CreatePlayerValidation.decode(request.body)
+
+    if (E.isLeft(decoded)) {
+      const message = formatValidationErrors(decoded.left)
+      request.log.warn({ body: request.body, errors: decoded.left }, message)
       return reply.status(400).send({ error: message })
     }
+
+    const { name } = decoded.right
 
     const tournament = getTournament(tournamentId)
     if (O.isNone(tournament)) {
