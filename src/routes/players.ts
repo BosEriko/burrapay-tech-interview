@@ -21,6 +21,10 @@ export async function playerRoutes(fastify: FastifyInstance) {
     const { tournamentId } = request.params
     const { name } = request.body ?? {}
 
+    if (typeof name !== 'string') {
+      return reply.status(400).send({ error: 'Name is required' })
+    }
+
     // TODO: Implement Pokemon validation and player creation logic
     
     reply.status(501).send({ error: 'Not implemented yet' })
