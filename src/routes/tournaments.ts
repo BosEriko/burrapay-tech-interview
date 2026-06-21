@@ -2,7 +2,7 @@ import { FastifyInstance } from 'fastify'
 import { pipe } from 'fp-ts/lib/function'
 import * as E from 'fp-ts/lib/Either'
 import { CreateTournamentRequest, TournamentResponse } from '../types/index.ts'
-import { createTournament } from '../storage/index.ts'
+import { createTournament, storage } from '../storage/index.ts'
 
 export async function tournamentRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: CreateTournamentRequest }>('/tournaments', async (request, reply) => {
@@ -28,5 +28,12 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
     )
   })
   
-  // TODO: Implement GET /tournaments endpoint
+  fastify.get('/tournaments', async (request, reply) => {
+    const tournaments = Array.from(storage.tournaments.values()).map(tournament => ({
+      id: tournament.id,
+      name: tournament.name,
+      createdAt: tournament.createdAt.toISOString()
+    }))
+    return reply.status(200).send(tournaments)
+  })
 }
