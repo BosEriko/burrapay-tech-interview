@@ -2,8 +2,6 @@ import Fastify from 'fastify'
 import { tournamentRoutes } from './routes/tournaments.ts'
 import { playerRoutes } from './routes/players.ts'
 
-// TODO: for interviewee: Set up the main Fastify server
-
 async function buildServer() {
   const fastify = Fastify({ logger: true })
   

@@ -84,14 +84,14 @@ src/
 
 ### Task 3: Complete Server Setup (`src/server.ts`)
 
-- [ ] Create Fastify instance with logging
-- [ ] Register tournament and player routes
-- [ ] Start server on port 3000
-- [ ] Handle startup errors appropriately
+- [x] Create Fastify instance with logging
+- [x] Register tournament and player routes
+- [x] Start server on port 3000
+- [x] Handle startup errors appropriately
 
 ### Task 4: Complete Entry Point (`src/index.ts`)
 
-- [ ] Import and call the start function
+- [x] Import and call the start function
 
 ## 🔧 Pokemon Integration Details
 
