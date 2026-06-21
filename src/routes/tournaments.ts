@@ -28,7 +28,7 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
     )
   })
   
-  fastify.get('/tournaments', async (request, reply) => {
+  fastify.get('/tournaments', async (_request, reply) => {
     const tournaments = Array.from(storage.tournaments.values()).map(tournament => ({
       id: tournament.id,
       name: tournament.name,
