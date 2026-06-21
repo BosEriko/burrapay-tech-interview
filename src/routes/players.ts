@@ -6,11 +6,13 @@ import * as TE from 'fp-ts/lib/TaskEither'
 import { CreatePlayerRequest, PlayerResponse, PokemonApiResponse } from '../types/index.ts'
 import { createPlayer, getTournament } from '../storage/index.ts'
 
-// TODO: for interviewee: Implement player routes using fp-ts patterns
-// CRITICAL REQUIREMENT: ONLY Pokemon can be added as players - reject all non-Pokemon names!
-
-// TODO: Implement Pokemon API validation function using TaskEither
-// const validatePokemon = (name: string): TE.TaskEither<string, PokemonApiResponse> => ...
+const validatePokemon = (name: string): TE.TaskEither<string, PokemonApiResponse> => TE.tryCatch(
+  () => fetch(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`).then(res => {
+    if (!res.ok) throw new Error('Not found')
+    return res.json() as Promise<PokemonApiResponse>
+  }),
+  (error) => `Name is not a valid Pokemon: ${error}`
+)
 
 export async function playerRoutes(fastify: FastifyInstance) {
   
