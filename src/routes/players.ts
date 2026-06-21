@@ -17,11 +17,10 @@ export async function playerRoutes(fastify: FastifyInstance) {
   // TODO: Implement POST /tournaments/:tournamentId/players endpoint
   // REQUIREMENT: Only Pokemon names are allowed - validate using PokeAPI
   
-  fastify.post<{ 
-    Params: { tournamentId: string }, 
-    Body: CreatePlayerRequest 
-  }>('/tournaments/:tournamentId/players', async (request, reply) => {
-    
+  fastify.post<{ Params: { tournamentId: string }, Body: CreatePlayerRequest }>('/tournaments/:tournamentId/players', async (request, reply) => {
+    const { tournamentId } = request.params
+    const { name } = request.body ?? {}
+
     // TODO: Implement Pokemon validation and player creation logic
     
     reply.status(501).send({ error: 'Not implemented yet' })
