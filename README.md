@@ -78,9 +78,9 @@ src/
 - [x] Implement `POST /tournaments/:tournamentId/players` endpoint
 - [x] Validate tournament exists before adding player
 - [x] **Pokemon Validation**: Verify player name is a valid Pokemon using PokeAPI
-- [ ] **REJECT non-Pokemon names** with 400 Bad Request error
-- [ ] Use `fp-ts` patterns for async operations and error handling
-- [ ] Return appropriate HTTP status codes (201/400/404)
+- [x] **REJECT non-Pokemon names** with 400 Bad Request error
+- [x] Use `fp-ts` patterns for async operations and error handling
+- [x] Return appropriate HTTP status codes (201/400/404)
 
 ### Task 3: Complete Server Setup (`src/server.ts`)
 

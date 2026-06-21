@@ -15,10 +15,6 @@ const validatePokemon = (name: string): TE.TaskEither<string, PokemonApiResponse
 )
 
 export async function playerRoutes(fastify: FastifyInstance) {
-  
-  // TODO: Implement POST /tournaments/:tournamentId/players endpoint
-  // REQUIREMENT: Only Pokemon names are allowed - validate using PokeAPI
-  
   fastify.post<{ Params: { tournamentId: string }, Body: CreatePlayerRequest }>('/tournaments/:tournamentId/players', async (request, reply) => {
     const { tournamentId } = request.params
     const { name } = request.body ?? {}
@@ -28,16 +24,40 @@ export async function playerRoutes(fastify: FastifyInstance) {
     }
 
     const tournament = getTournament(tournamentId)
-
     if (O.isNone(tournament)) {
       return reply.status(404).send({ error: 'Tournament not found' })
     }
 
-    // TODO: Implement Pokemon validation and player creation logic
-    
-    reply.status(501).send({ error: 'Not implemented yet' })
-    
-    reply.status(501).send({ error: 'Not implemented yet' })
+    const handlePlayerData = (pokemonData: PokemonApiResponse) => {
+      const playerResult = createPlayer(name, tournamentId, {
+        id: pokemonData.id,
+        types: pokemonData.types.map(t => t.type.name),
+        height: pokemonData.height,
+        weight: pokemonData.weight
+      })
+
+      return pipe(
+        playerResult,
+        E.fold(
+          (error) => reply.status(400).send({ error }),
+          (player) => {
+            const response: PlayerResponse = {
+              id: player.id,
+              name: player.name,
+              tournamentId: player.tournamentId
+            }
+            return reply.status(201).send(response)
+          }
+        )
+      )
+    }
+
+    return pipe(
+      await validatePokemon(name)(),
+      E.fold(
+        (error) => reply.status(400).send({ error }),
+        handlePlayerData
+      )
+    )
   })
-  
 }
