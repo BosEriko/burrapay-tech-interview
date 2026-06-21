@@ -254,8 +254,8 @@ You will be evaluated on:
 - [x] Implement GET endpoints to retrieve tournaments and players
 - [ ] Add input validation using `io-ts` (another fp-ts ecosystem library)
 - [ ] Implement proper logging with structured data
-- [ ] Add rate limiting for PokeAPI calls
-- [ ] Cache Pokemon data to avoid repeated API calls
+- [x] Add rate limiting for PokeAPI calls
+- [x] Cache Pokemon data to avoid repeated API calls
 
 ## 🚨 Important Notes
 
