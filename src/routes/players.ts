@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/lib/function'
 import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 import * as TE from 'fp-ts/lib/TaskEither'
-import { CreatePlayerRequest, PlayerResponse, PokemonApiResponse } from '../types/index.ts'
+import { CreatePlayerRequest, Player, PlayerResponse, PokemonApiResponse } from '../types/index.ts'
 import { createPlayer, getTournament, getPlayersByTournament } from '../storage/index.ts'
 
 const validatePokemon = (name: string): TE.TaskEither<string, PokemonApiResponse> => TE.tryCatch(
@@ -15,7 +15,7 @@ const validatePokemon = (name: string): TE.TaskEither<string, PokemonApiResponse
 )
 
 export async function playerRoutes(fastify: FastifyInstance) {
-  fastify.post<{ Params: { tournamentId: string }, Body: CreatePlayerRequest }>('/tournaments/:tournamentId/players', async (request, reply) => {
+  fastify.post<{ Params: { tournamentId: string }, Body: CreatePlayerRequest, Reply: PlayerResponse | { error: string } }>('/tournaments/:tournamentId/players', async (request, reply) => {
     const { tournamentId } = request.params
     const { name } = request.body ?? {}
 
@@ -61,7 +61,7 @@ export async function playerRoutes(fastify: FastifyInstance) {
     )
   })
 
-  fastify.get<{ Params: { tournamentId: string } }>('/tournaments/:tournamentId/players', async (request, reply) => {
+  fastify.get<{ Params: { tournamentId: string }, Reply: Player[] | { error: string } }>('/tournaments/:tournamentId/players', async (request, reply) => {
     const { tournamentId } = request.params
 
     const tournament = getTournament(tournamentId)

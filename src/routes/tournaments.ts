@@ -5,7 +5,7 @@ import { CreateTournamentRequest, TournamentResponse } from '../types/index.ts'
 import { createTournament, storage } from '../storage/index.ts'
 
 export async function tournamentRoutes(fastify: FastifyInstance) {
-  fastify.post<{ Body: CreateTournamentRequest }>('/tournaments', async (request, reply) => {
+  fastify.post<{ Body: CreateTournamentRequest, Reply: TournamentResponse | { error: string } }>('/tournaments', async (request, reply) => {
     const { name } = request.body ?? {}
 
     if (typeof name !== 'string') {
