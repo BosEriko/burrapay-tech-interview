@@ -36,6 +36,3 @@ lib
 # settings
 .idea
 .vscode/settings.json
-
-# notes
-*.note.*
