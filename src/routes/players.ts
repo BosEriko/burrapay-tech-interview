@@ -4,7 +4,7 @@ import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 import * as TE from 'fp-ts/lib/TaskEither'
 import { CreatePlayerRequest, Player, PlayerResponse, PokemonApiResponse } from '../types/index.ts'
-import { createPlayer, getTournament, getPlayer, getPlayersByTournament } from '../storage/index.ts'
+import { createPlayer, getTournament, getPlayer, getAllPlayers, getPlayersByTournament } from '../storage/index.ts'
 
 const validatePokemon = (name: string): TE.TaskEither<string, PokemonApiResponse> => TE.tryCatch(
   () => fetch(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`).then(res => {
@@ -88,5 +88,9 @@ export async function playerRoutes(fastify: FastifyInstance) {
         (player) => reply.status(200).send(player)
       )
     )
+  })
+
+  fastify.get<{ Reply: Player[] }>('/players', async (_request, reply) => {
+    return reply.status(200).send(getAllPlayers())
   })
 }

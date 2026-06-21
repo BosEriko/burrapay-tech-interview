@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/lib/function'
 import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 import { CreateTournamentRequest, TournamentResponse } from '../types/index.ts'
-import { createTournament, getTournament, storage } from '../storage/index.ts'
+import { createTournament, getTournament, getAllTournaments } from '../storage/index.ts'
 
 export async function tournamentRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: CreateTournamentRequest, Reply: TournamentResponse | { error: string } }>('/tournaments', async (request, reply) => {
@@ -30,7 +30,7 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
   })
   
   fastify.get<{ Reply: TournamentResponse[] }>('/tournaments', async (_request, reply) => {
-    const tournaments = Array.from(storage.tournaments.values()).map(tournament => ({
+    const tournaments = getAllTournaments().map(tournament => ({
       id: tournament.id,
       name: tournament.name,
       createdAt: tournament.createdAt.toISOString()
