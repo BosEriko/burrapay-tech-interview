@@ -11,7 +11,7 @@ const validatePokemon = (name: string): TE.TaskEither<string, PokemonApiResponse
     if (!res.ok) throw new Error('Not found')
     return res.json() as Promise<PokemonApiResponse>
   }),
-  (error) => `Name is not a valid Pokemon: ${error}`
+  () => 'Name is not a valid Pokemon'
 )
 
 export async function playerRoutes(fastify: FastifyInstance) {
@@ -73,13 +73,8 @@ export async function playerRoutes(fastify: FastifyInstance) {
     return reply.status(200).send(players)
   })
 
-  fastify.get<{ Params: { tournamentId: string, playerId: string }, Reply: Player | { error: string } }>('/tournaments/:tournamentId/players/:playerId', async (request, reply) => {
-    const { tournamentId, playerId } = request.params
-
-    const tournament = getTournament(tournamentId)
-    if (O.isNone(tournament)) {
-      return reply.status(404).send({ error: 'Tournament not found' })
-    }
+  fastify.get<{ Params: { playerId: string }, Reply: Player | { error: string } }>('/players/:playerId', async (request, reply) => {
+    const { playerId } = request.params
 
     return pipe(
       getPlayer(playerId),
