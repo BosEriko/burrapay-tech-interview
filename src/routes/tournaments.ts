@@ -1,7 +1,6 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import { FastifyInstance } from 'fastify'
 import { pipe } from 'fp-ts/lib/function'
 import * as E from 'fp-ts/lib/Either'
-import * as TE from 'fp-ts/lib/TaskEither'
 import { CreateTournamentRequest, TournamentResponse } from '../types/index.ts'
 import { createTournament } from '../storage/index.ts'
 
