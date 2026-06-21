@@ -6,7 +6,7 @@ import * as TE from 'fp-ts/lib/TaskEither'
 import { CreatePlayerRequest, PlayerResponse, PokemonApiResponse } from '../types/index.ts'
 import { createPlayer, getTournament } from '../storage/index.ts'
 
-// TODO for interviewee: Implement player routes using fp-ts patterns
+// TODO: for interviewee: Implement player routes using fp-ts patterns
 // CRITICAL REQUIREMENT: ONLY Pokemon can be added as players - reject all non-Pokemon names!
 
 // TODO: Implement Pokemon API validation function using TaskEither

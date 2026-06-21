@@ -9,6 +9,8 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
   
   // TODO: Implement POST /tournaments endpoint using fp-ts patterns
   fastify.post<{ Body: CreateTournamentRequest }>('/tournaments', async (request, reply) => {
+    const { name } = request.body ?? {}
+
     // TODO: Use createTournament() and handle Either result with pipe/E.fold
     reply.status(501).send({ error: 'Not implemented yet' })
   })
