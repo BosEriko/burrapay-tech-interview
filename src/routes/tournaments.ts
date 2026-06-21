@@ -6,8 +6,6 @@ import { CreateTournamentRequest, TournamentResponse } from '../types/index.ts'
 import { createTournament } from '../storage/index.ts'
 
 export async function tournamentRoutes(fastify: FastifyInstance) {
-  
-  // TODO: Implement POST /tournaments endpoint using fp-ts patterns
   fastify.post<{ Body: CreateTournamentRequest }>('/tournaments', async (request, reply) => {
     const { name } = request.body ?? {}
 
@@ -15,10 +13,16 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
       return reply.status(400).send({ error: 'Name is required' })
     }
 
-    // TODO: Use createTournament() and handle Either result with pipe/E.fold
-    reply.status(501).send({ error: 'Not implemented yet' })
+    return pipe(
+      createTournament(name),
+      E.fold(
+        (error) => reply.status(400).send({ error }),
+        (success) => {
+          return reply.status(201).send(success)
+        }
+      )
+    )
   })
   
   // TODO: Implement GET /tournaments endpoint
-  
 }
