@@ -3,7 +3,14 @@ import { tournamentRoutes } from './routes/tournaments.ts'
 import { playerRoutes } from './routes/players.ts'
 
 async function buildServer() {
-  const fastify = Fastify({ logger: true })
+  const fastify = Fastify({
+    logger: {
+      level: process.env.NODE_ENV === 'test' ? 'silent' : 'info',
+      transport: process.env.NODE_ENV !== 'production'
+        ? { target: 'pino-pretty', options: { colorize: true, translateTime: 'SYS:standard' } }
+        : undefined
+    }
+  })
   
   // Register routes
   await fastify.register(tournamentRoutes)
@@ -18,17 +25,20 @@ async function buildServer() {
 }
 
 async function start() {
+  let fastify
   try {
-    const fastify = await buildServer()
+    fastify = await buildServer()
     
     await fastify.listen({ port: 3000, host: '0.0.0.0' })
     
-    console.log('🚀 Pokemon Tournament API Server started successfully!')
-    console.log('📡 Server running on http://localhost:3000')
-    console.log('🎮 Ready to accept Pokemon players only!')
+    fastify.log.info({ port: 3000 }, 'Server started')
     
   } catch (err) {
-    console.error('❌ Error starting server:', err)
+    if (fastify) {
+      fastify.log.error({ err }, 'Failed to start server')
+    } else {
+      console.error('Failed to start server:', err)
+    }
     process.exit(1)
   }
 }

@@ -12,15 +12,20 @@ export async function playerRoutes(fastify: FastifyInstance) {
     const { name } = request.body ?? {}
 
     if (typeof name !== 'string') {
-      return reply.status(400).send({ error: 'Name is required' })
+      const message = 'Name is required'
+      request.log.warn({ body: request.body }, message)
+      return reply.status(400).send({ error: message })
     }
 
     const tournament = getTournament(tournamentId)
     if (O.isNone(tournament)) {
-      return reply.status(404).send({ error: 'Tournament not found' })
+      const message = 'Tournament not found'
+      request.log.warn({ tournamentId }, message)
+      return reply.status(404).send({ error: message })
     }
 
     const handlePlayerData = (pokemonData: PokemonApiResponse) => {
+      request.log.info({ pokemonName: name, pokemonId: pokemonData.id }, 'Pokemon validated')
       const playerResult = createPlayer(name, tournamentId, {
         id: pokemonData.id,
         types: pokemonData.types.map(t => t.type.name),
@@ -31,8 +36,12 @@ export async function playerRoutes(fastify: FastifyInstance) {
       return pipe(
         playerResult,
         E.fold(
-          (error) => reply.status(400).send({ error }),
+          (error) => {
+            request.log.error({ error }, 'Failed to create player')
+            return reply.status(400).send({ error })
+          },
           (player) => {
+            request.log.info({ playerId: player.id, pokemonName: player.name, tournamentId }, 'Player added to tournament')
             const response: PlayerResponse = {
               id: player.id,
               name: player.name,
@@ -47,7 +56,10 @@ export async function playerRoutes(fastify: FastifyInstance) {
     return pipe(
       await fetchPokemon(name)(),
       E.fold(
-        (error) => reply.status(400).send({ error }),
+        (error) => {
+          request.log.warn({ pokemonName: name, error }, 'Pokemon validation failed')
+          return reply.status(400).send({ error })
+        },
         handlePlayerData
       )
     )

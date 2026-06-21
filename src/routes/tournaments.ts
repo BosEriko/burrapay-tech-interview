@@ -10,14 +10,20 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
     const { name } = request.body ?? {}
 
     if (typeof name !== 'string') {
-      return reply.status(400).send({ error: 'Name is required' })
+      const message = 'Name is required'
+      request.log.warn({ body: request.body }, message)
+      return reply.status(400).send({ error: message })
     }
 
     return pipe(
       createTournament(name),
       E.fold(
-        (error) => reply.status(400).send({ error }),
+        (error) => {
+          request.log.error({ error }, 'Failed to create tournament')
+          return reply.status(400).send({ error })
+        },
         (tournament) => {
+          request.log.info({ tournamentId: tournament.id, name: tournament.name }, 'Tournament created')
           const response: TournamentResponse = {
             id: tournament.id,
             name: tournament.name,
@@ -44,12 +50,18 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
     return pipe(
       getTournament(id),
       O.fold(
-        () => reply.status(404).send({ error: 'Tournament not found' }),
-        (tournament) => reply.status(200).send({
-          id: tournament.id,
-          name: tournament.name,
-          createdAt: tournament.createdAt.toISOString()
-        })
+        () => {
+          request.log.warn({ tournamentId: id }, 'Tournament not found')
+          return reply.status(404).send({ error: 'Tournament not found' })
+        },
+        (tournament) => {
+          request.log.info({ tournamentId: id }, 'Tournament retrieved')
+          return reply.status(200).send({
+            id: tournament.id,
+            name: tournament.name,
+            createdAt: tournament.createdAt.toISOString()
+          })
+        }
       )
     )
   })
