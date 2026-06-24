@@ -4,6 +4,7 @@ import * as t from 'fp-ts/lib/struct'
 export interface Tournament {
   id: string
   name: string
+  isMega: boolean
   createdAt: Date
 }
 
@@ -36,6 +37,7 @@ export interface PokemonApiResponse {
 // Request types for creating tournaments
 export interface CreateTournamentRequest {
   name: string
+  isMega: boolean
 }
 
 // Request types for adding players
@@ -47,6 +49,7 @@ export interface CreatePlayerRequest {
 export interface TournamentResponse {
   id: string
   name: string
+  isMega: boolean
   createdAt: string
 }
 

@@ -1,7 +1,8 @@
 import * as t from 'io-ts'
 
 export const CreateTournamentValidation = t.type({
-  name: t.string
+  name: t.string,
+  isMega: t.boolean
 })
 
 export const CreatePlayerValidation = t.type({

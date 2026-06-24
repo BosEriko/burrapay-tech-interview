@@ -7,7 +7,7 @@ import { createTournament, getTournament, getAllTournaments } from '../storage/i
 import { CreateTournamentValidation, formatValidationErrors } from '../validation/index.ts'
 
 export async function tournamentRoutes(fastify: FastifyInstance) {
-  fastify.post<{ Body: { name: string }, Reply: TournamentResponse | { error: string } }>('/tournaments', async (request, reply) => {
+  fastify.post<{ Body: { name: string, isMega: boolean }, Reply: TournamentResponse | { error: string } }>('/tournaments', async (request, reply) => {
     const decoded = CreateTournamentValidation.decode(request.body)
 
     if (E.isLeft(decoded)) {
@@ -16,10 +16,10 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
       return reply.status(400).send({ error: message })
     }
 
-    const { name } = decoded.right
+    const { name, isMega } = decoded.right
 
     return pipe(
-      createTournament(name),
+      createTournament(name, isMega),
       E.fold(
         (error) => {
           request.log.error({ error }, 'Failed to create tournament')
@@ -30,6 +30,7 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
           const response: TournamentResponse = {
             id: tournament.id,
             name: tournament.name,
+            isMega: tournament.isMega,
             createdAt: tournament.createdAt.toISOString()
           }
           return reply.status(201).send(response)
@@ -42,6 +43,7 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
     const tournaments = getAllTournaments().map(tournament => ({
       id: tournament.id,
       name: tournament.name,
+      isMega: tournament.isMega,
       createdAt: tournament.createdAt.toISOString()
     }))
     return reply.status(200).send(tournaments)
@@ -62,6 +64,7 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
           return reply.status(200).send({
             id: tournament.id,
             name: tournament.name,
+            isMega: tournament.isMega,
             createdAt: tournament.createdAt.toISOString()
           })
         }
