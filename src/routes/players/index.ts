@@ -8,6 +8,7 @@ import { getTournament, getPlayer, getAllPlayers, getPlayersByTournament } from 
 import { CreatePlayerValidation } from '../../validation'
 import { validationStep } from './steps/validationStep'
 import { checkTournamentStep } from './steps/checkTournamentStep'
+import { checkMegaStep } from './steps/checkMegaStep'
 import { fetchPokemonStep } from './steps/fetchPokemonStep'
 import { createPlayerStep } from './steps/createPlayerStep'
 
@@ -21,6 +22,7 @@ export async function playerRoutes(fastify: FastifyInstance) {
       validationStep(request),
       TE.fromEither,
       checkTournamentStep(request, tournamentId),
+      checkMegaStep(request),
       fetchPokemonStep(request),
       createPlayerStep(request, tournamentId),
       TE.fold(
