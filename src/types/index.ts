@@ -58,3 +58,8 @@ export interface PlayerResponse {
   name: string
   tournamentId: string
 }
+
+export interface PlayerError {
+  readonly statusCode: number
+  readonly message: string
+}

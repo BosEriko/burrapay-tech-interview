@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import Fastify from 'fastify'
-import { tournamentRoutes } from '../routes/tournaments.ts'
-import { playerRoutes } from '../routes/players.ts'
+import { tournamentRoutes } from '../routes/tournaments'
+import { playerRoutes } from '../routes/players'
 
 // Test server helper that builds server without auto-start
 export async function createTestServer(): Promise<FastifyInstance> {

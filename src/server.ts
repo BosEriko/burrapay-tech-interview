@@ -1,6 +1,6 @@
 import Fastify from 'fastify'
-import { tournamentRoutes } from './routes/tournaments.ts'
-import { playerRoutes } from './routes/players.ts'
+import { tournamentRoutes } from './routes/tournaments'
+import { playerRoutes } from './routes/players'
 
 async function buildServer() {
   const fastify = Fastify({

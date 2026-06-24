@@ -2,24 +2,20 @@ import { FastifyInstance } from 'fastify'
 import { pipe } from 'fp-ts/lib/function'
 import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
-import { TournamentResponse } from '../types/index.ts'
-import { createTournament, getTournament, getAllTournaments } from '../storage/index.ts'
-import { CreateTournamentValidation, formatValidationErrors } from '../validation/index.ts'
+import { TournamentResponse } from '../../types'
+import { getTournament, getAllTournaments } from '../../storage'
+import { CreateTournamentValidation } from '../../validation'
+import { validationStep } from './steps/validationStep'
+import { createTournamentStep } from './steps/createTournamentStep'
 
 export async function tournamentRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: { name: string, isMega: boolean }, Reply: TournamentResponse | { error: string } }>('/tournaments', async (request, reply) => {
     const decoded = CreateTournamentValidation.decode(request.body)
 
-    if (E.isLeft(decoded)) {
-      const message = formatValidationErrors(decoded.left)
-      request.log.warn({ body: request.body, errors: decoded.left }, message)
-      return reply.status(400).send({ error: message })
-    }
-
-    const { name, isMega } = decoded.right
-
     return pipe(
-      createTournament(name, isMega),
+      decoded,
+      validationStep(request),
+      createTournamentStep,
       E.fold(
         (error) => {
           request.log.error({ error }, 'Failed to create tournament')
@@ -38,7 +34,7 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
       )
     )
   })
-  
+
   fastify.get<{ Reply: TournamentResponse[] }>('/tournaments', async (_request, reply) => {
     const tournaments = getAllTournaments().map(tournament => ({
       id: tournament.id,
