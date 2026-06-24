@@ -7,7 +7,7 @@ import { Player, PlayerResponse } from '../../types'
 import { getTournament, getPlayer, getAllPlayers, getPlayersByTournament } from '../../storage'
 import { CreatePlayerValidation } from '../../validation'
 import { validationStep } from './steps/validationStep'
-import { checkTournament } from './steps/checkTournamentStep'
+import { checkTournamentStep } from './steps/checkTournamentStep'
 import { fetchPokemonStep } from './steps/fetchPokemonStep'
 import { createPlayerStep } from './steps/createPlayerStep'
 
