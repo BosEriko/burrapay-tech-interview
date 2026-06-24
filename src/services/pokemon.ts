@@ -16,6 +16,10 @@ const isRateLimited = (): boolean => {
   return requestTimestamps.length >= MAX_REQUESTS
 }
 
+export const isMega = (pokemon: string): boolean => {
+  return pokemon.endsWith("-mega");
+}
+
 const log = (message: string, data: Record<string, unknown> = {}) => {
   if (process.env.NODE_ENV !== 'test') {
     console.log(JSON.stringify({ level: 'info', message, ...data, timestamp: new Date().toISOString() }))

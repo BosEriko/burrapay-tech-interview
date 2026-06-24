@@ -4,7 +4,7 @@ import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 import { Player, PlayerResponse, PokemonApiResponse } from '../types/index.ts'
 import { createPlayer, getTournament, getPlayer, getAllPlayers, getPlayersByTournament } from '../storage/index.ts'
-import { fetchPokemon } from '../services/pokemon.ts'
+import { fetchPokemon, isMega } from '../services/pokemon.ts'
 import { CreatePlayerValidation, formatValidationErrors } from '../validation/index.ts'
 
 export async function playerRoutes(fastify: FastifyInstance) {
@@ -26,6 +26,12 @@ export async function playerRoutes(fastify: FastifyInstance) {
       const message = 'Tournament not found'
       request.log.warn({ tournamentId }, message)
       return reply.status(404).send({ error: message })
+    }
+
+    if (tournament.value.isMega && !isMega(name.toLowerCase())) {
+      const message = 'Pokemon must be a mega pokemon'
+      request.log.warn({ tournamentId, name }, message)
+      return reply.status(400).send({ error: message })
     }
 
     const handlePlayerData = (pokemonData: PokemonApiResponse) => {
