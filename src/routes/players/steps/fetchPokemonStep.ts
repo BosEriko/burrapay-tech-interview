@@ -1,5 +1,5 @@
 import * as TE from 'fp-ts/lib/TaskEither'
-import { pipe } from 'fp-ts/lib/function'
+import { pipe } from "effect"
 import { PlayerError } from '../../../types'
 import { fetchPokemon } from '../../../services/pokemon'
 import { FastifyRequest } from 'fastify'

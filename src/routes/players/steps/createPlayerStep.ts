@@ -1,6 +1,6 @@
 import * as E from 'fp-ts/lib/Either'
 import * as TE from 'fp-ts/lib/TaskEither'
-import { pipe } from 'fp-ts/lib/function'
+import { pipe } from "effect"
 import { PlayerError, PokemonApiResponse } from '../../../types'
 import { createPlayer } from '../../../storage'
 import { FastifyRequest } from 'fastify'
