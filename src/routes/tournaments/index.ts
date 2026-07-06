@@ -1,7 +1,6 @@
 import { FastifyInstance } from 'fastify'
-import { pipe } from "effect"
+import { pipe, Option } from "effect"
 import * as E from 'fp-ts/lib/Either'
-import * as O from 'fp-ts/lib/Option'
 import { TournamentResponse } from '../../types'
 import { getTournament, getAllTournaments } from '../../storage'
 import { CreateTournamentValidation } from '../../validation'
@@ -50,12 +49,12 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
 
     return pipe(
       getTournament(id),
-      O.fold(
-        () => {
+      Option.match({
+        onNone: () => {
           request.log.warn({ tournamentId: id }, 'Tournament not found')
           return reply.status(404).send({ error: 'Tournament not found' })
         },
-        (tournament) => {
+        onSome: (tournament) => {
           request.log.info({ tournamentId: id }, 'Tournament retrieved')
           return reply.status(200).send({
             id: tournament.id,
@@ -64,7 +63,7 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
             createdAt: tournament.createdAt.toISOString()
           })
         }
-      )
+      })
     )
   })
 }

@@ -1,6 +1,5 @@
-import { Option } from 'fp-ts/lib/Option'
+import { Option } from "effect"
 import { Either } from 'fp-ts/lib/Either'
-import * as O from 'fp-ts/lib/Option'
 import * as E from 'fp-ts/lib/Either'
 import { Tournament, Player } from '../types/index.ts'
 import { v4 as uuidv4 } from 'uuid'
@@ -33,8 +32,8 @@ export const createTournament = (name: string, isMega: boolean): Either<string, 
   return E.right(tournament)
 }
 
-export const getTournament = (id: string): Option<Tournament> => {
-  return O.fromNullable(storage.tournaments.get(id))
+export const getTournament = (id: string): Option.Option<Tournament> => {
+  return Option.fromNullable(storage.tournaments.get(id))
 }
 
 export const getAllTournaments = (): Tournament[] => {
@@ -51,7 +50,7 @@ export const createPlayer = (name: string, tournamentId: string, pokemonData: {
   // Check if tournament exists
   const tournament = getTournament(tournamentId)
   
-  if (O.isNone(tournament)) {
+  if (Option.isNone(tournament)) {
     return E.left('Tournament not found')
   }
   
@@ -66,8 +65,8 @@ export const createPlayer = (name: string, tournamentId: string, pokemonData: {
   return E.right(player)
 }
 
-export const getPlayer = (id: string): Option<Player> => {
-  return O.fromNullable(storage.players.get(id))
+export const getPlayer = (id: string): Option.Option<Player> => {
+  return Option.fromNullable(storage.players.get(id))
 }
 
 export const getAllPlayers = (): Player[] => {

@@ -1,8 +1,7 @@
 import { FastifyInstance } from 'fastify'
-import { pipe } from "effect"
+import { pipe, Option } from "effect"
 import * as E from 'fp-ts/lib/Either'
 import * as TE from 'fp-ts/lib/TaskEither'
-import * as O from 'fp-ts/lib/Option'
 import { Player, PlayerResponse } from '../../types'
 import { getTournament, getPlayer, getAllPlayers, getPlayersByTournament } from '../../storage'
 import { CreatePlayerValidation } from '../../validation'
@@ -45,10 +44,10 @@ export async function playerRoutes(fastify: FastifyInstance) {
 
     return pipe(
       getTournament(tournamentId),
-      O.fold(
-        () => reply.status(404).send({ error: 'Tournament not found' }),
-        () => reply.status(200).send(getPlayersByTournament(tournamentId))
-      )
+      Option.match({
+        onNone: () => reply.status(404).send({ error: 'Tournament not found' }),
+        onSome: () => reply.status(200).send(getPlayersByTournament(tournamentId))
+      })
     )
   })
 
@@ -57,10 +56,10 @@ export async function playerRoutes(fastify: FastifyInstance) {
 
     return pipe(
       getPlayer(playerId),
-      O.fold(
-        () => reply.status(404).send({ error: 'Player not found' }),
-        (player) => reply.status(200).send(player)
-      )
+      Option.match({
+        onNone: () => reply.status(404).send({ error: 'Player not found' }),
+        onSome: (player) => reply.status(200).send(player)
+      })
     )
   })
 
