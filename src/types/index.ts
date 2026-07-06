@@ -1,5 +1,3 @@
-import * as t from 'fp-ts/lib/struct'
-
 // Tournament interface
 export interface Tournament {
   id: string
