@@ -4,7 +4,7 @@ import * as E from 'fp-ts/lib/Either'
 import * as TE from 'fp-ts/lib/TaskEither'
 import { Player, PlayerResponse } from '../../types'
 import { getTournament, getPlayer, getAllPlayers, getPlayersByTournament } from '../../storage'
-import { CreatePlayerValidation } from '../../validation'
+import { decode, CreatePlayerValidation } from '../../validation'
 import { validationStep } from './steps/validationStep'
 import { checkTournamentStep } from './steps/checkTournamentStep'
 import { checkMegaStep } from './steps/checkMegaStep'
@@ -14,7 +14,7 @@ import { createPlayerStep } from './steps/createPlayerStep'
 export async function playerRoutes(fastify: FastifyInstance) {
   fastify.post<{ Params: { tournamentId: string }, Body: { name: string }, Reply: PlayerResponse | { error: string } }>('/tournaments/:tournamentId/players', async (request, reply) => {
     const { tournamentId } = request.params
-    const decoded = CreatePlayerValidation.decode(request.body)
+    const decoded = decode(CreatePlayerValidation)(request.body)
 
     return await pipe(
       decoded,

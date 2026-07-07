@@ -3,13 +3,13 @@ import { pipe, Option } from "effect"
 import * as E from 'fp-ts/lib/Either'
 import { TournamentResponse } from '../../types'
 import { getTournament, getAllTournaments } from '../../storage'
-import { CreateTournamentValidation } from '../../validation'
+import { decode, CreateTournamentValidation } from '../../validation'
 import { validationStep } from './steps/validationStep'
 import { createTournamentStep } from './steps/createTournamentStep'
 
 export async function tournamentRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: { name: string, isMega: boolean }, Reply: TournamentResponse | { error: string } }>('/tournaments', async (request, reply) => {
-    const decoded = CreateTournamentValidation.decode(request.body)
+    const decoded = decode(CreateTournamentValidation)(request.body)
 
     return pipe(
       decoded,
