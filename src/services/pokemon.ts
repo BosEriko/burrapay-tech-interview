@@ -1,4 +1,4 @@
-import * as TE from 'fp-ts/lib/TaskEither'
+import { Effect } from 'effect'
 import { PokemonApiResponse } from '../types/index.ts'
 
 const pokemonCache = new Map<string, PokemonApiResponse>()
@@ -26,26 +26,26 @@ const log = (message: string, data: Record<string, unknown> = {}) => {
   }
 }
 
-export const fetchPokemon = (name: string): TE.TaskEither<string, PokemonApiResponse> => {
+export const fetchPokemon = (name: string): Effect.Effect<PokemonApiResponse, string> => {
   const normalized = name.toLowerCase()
   const cached = pokemonCache.get(normalized)
 
   if (cached) {
     log('Pokemon cache hit', { name: normalized })
-    return TE.right(cached)
+    return Effect.succeed(cached)
   }
 
   if (isRateLimited()) {
     log('Pokemon API rate limited', { name: normalized })
-    return TE.left('Pokemon API rate limit exceeded, please try again later')
+    return Effect.fail('Pokemon API rate limit exceeded, please try again later')
   }
 
-  return TE.tryCatch(
-    () => {
+  return Effect.tryPromise({
+    try: () => {
       requestTimestamps.push(Date.now())
       log('Pokemon API fetch', { name: normalized })
       return fetch(`https://pokeapi.co/api/v2/pokemon/${normalized}`).then(res => {
-        if (!res.ok) throw new Error('Not found')
+        if (!res.ok) throw 'Not found'
         return res.json() as Promise<PokemonApiResponse>
       }).then(data => {
         pokemonCache.set(normalized, data)
@@ -53,9 +53,9 @@ export const fetchPokemon = (name: string): TE.TaskEither<string, PokemonApiResp
         return data
       })
     },
-    (error) => {
+    catch: (error) => {
       log('Pokemon API error', { name: normalized, error: String(error) })
       return 'Name is not a valid Pokemon'
     }
-  )
+  })
 }

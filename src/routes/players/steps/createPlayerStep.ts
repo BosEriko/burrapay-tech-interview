@@ -1,6 +1,4 @@
-import * as E from 'fp-ts/lib/Either'
-import * as TE from 'fp-ts/lib/TaskEither'
-import { pipe } from "effect"
+import { Either, Effect, pipe } from "effect"
 import { PlayerError, PokemonApiResponse } from '../../../types'
 import { createPlayer } from '../../../storage'
 import { FastifyRequest } from 'fastify'
@@ -8,7 +6,7 @@ import { FastifyRequest } from 'fastify'
 const badRequest = (message: string): PlayerError => ({ statusCode: 400, message })
 
 export const createPlayerStep = (request: FastifyRequest, tournamentId: string) =>
-  TE.chain(({ name, pokemonData }: { name: string; pokemonData: PokemonApiResponse }) =>
+  Effect.flatMap(({ name, pokemonData }: { name: string; pokemonData: PokemonApiResponse }) =>
     pipe(
       createPlayer(name, tournamentId, {
         id: pokemonData.id,
@@ -16,10 +14,13 @@ export const createPlayerStep = (request: FastifyRequest, tournamentId: string) 
         height: pokemonData.height,
         weight: pokemonData.weight
       }),
-      E.mapLeft((error): PlayerError => {
+      Either.mapLeft((error): PlayerError => {
         request.log.error({ error }, 'Failed to create player')
         return badRequest(error)
       }),
-      TE.fromEither
+      Either.match({
+        onLeft: (e) => Effect.fail(e),
+        onRight: (a) => Effect.succeed(a)
+      })
     )
   )

@@ -1,6 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import { pipe, Option } from "effect"
-import * as E from 'fp-ts/lib/Either'
+import { pipe, Option, Either } from "effect"
 import { TournamentResponse } from '../../types'
 import { getTournament, getAllTournaments } from '../../storage'
 import { decode, CreateTournamentValidation } from '../../validation'
@@ -15,12 +14,12 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
       decoded,
       validationStep(request),
       createTournamentStep,
-      E.fold(
-        (error) => {
+      Either.match({
+        onLeft: (error) => {
           request.log.error({ error }, 'Failed to create tournament')
           return reply.status(400).send({ error })
         },
-        (tournament) => {
+        onRight: (tournament) => {
           request.log.info({ tournamentId: tournament.id, name: tournament.name }, 'Tournament created')
           const response: TournamentResponse = {
             id: tournament.id,
@@ -30,7 +29,7 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
           }
           return reply.status(201).send(response)
         }
-      )
+      })
     )
   })
 

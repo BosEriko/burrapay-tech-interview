@@ -1,6 +1,4 @@
-import { Option } from "effect"
-import { Either } from 'fp-ts/lib/Either'
-import * as E from 'fp-ts/lib/Either'
+import { Option, Either } from "effect"
 import { Tournament, Player } from '../types/index.ts'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -20,16 +18,15 @@ export const createStorage = (): TournamentStorage => ({
 export const storage = createStorage()
 
 // Tournament operations
-export const createTournament = (name: string, isMega: boolean): Either<string, Tournament> => {
+export const createTournament = (name: string, isMega: boolean): Either.Either<Tournament, string> => {
   const tournament: Tournament = {
     id: uuidv4(),
     name,
     isMega,
     createdAt: new Date()
   }
-  
   storage.tournaments.set(tournament.id, tournament)
-  return E.right(tournament)
+  return Either.right(tournament)
 }
 
 export const getTournament = (id: string): Option.Option<Tournament> => {
@@ -46,23 +43,19 @@ export const createPlayer = (name: string, tournamentId: string, pokemonData: {
   types: string[]
   height: number
   weight: number
-}): Either<string, Player> => {
-  // Check if tournament exists
+}): Either.Either<Player, string> => {
   const tournament = getTournament(tournamentId)
-  
   if (Option.isNone(tournament)) {
-    return E.left('Tournament not found')
+    return Either.left('Tournament not found')
   }
-  
   const player: Player = {
     id: uuidv4(),
     name,
     tournamentId,
     pokemonData
   }
-  
   storage.players.set(player.id, player)
-  return E.right(player)
+  return Either.right(player)
 }
 
 export const getPlayer = (id: string): Option.Option<Player> => {

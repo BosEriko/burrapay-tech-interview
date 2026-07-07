@@ -1,7 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import { pipe, Option } from "effect"
-import * as E from 'fp-ts/lib/Either'
-import * as TE from 'fp-ts/lib/TaskEither'
+import { pipe, Option, Either, Effect } from "effect"
 import { Player, PlayerResponse } from '../../types'
 import { getTournament, getPlayer, getAllPlayers, getPlayersByTournament } from '../../storage'
 import { decode, CreatePlayerValidation } from '../../validation'
@@ -16,27 +14,32 @@ export async function playerRoutes(fastify: FastifyInstance) {
     const { tournamentId } = request.params
     const decoded = decode(CreatePlayerValidation)(request.body)
 
-    return await pipe(
-      decoded,
-      validationStep(request),
-      TE.fromEither,
-      checkTournamentStep(request, tournamentId),
-      checkMegaStep(request),
-      fetchPokemonStep(request),
-      createPlayerStep(request, tournamentId),
-      TE.fold(
-        (error) => reply.status(error.statusCode).send({ error: error.message }),
-        (player) => {
-          request.log.info({ playerId: player.id, pokemonName: player.name, tournamentId }, 'Player added to tournament')
-          const response: PlayerResponse = {
-            id: player.id,
-            name: player.name,
-            tournamentId: player.tournamentId
+    return await Effect.runPromise(
+      pipe(
+        decoded,
+        validationStep(request),
+        Either.match({
+          onLeft: (e) => Effect.fail(e),
+          onRight: (a) => Effect.succeed(a)
+        }),
+        checkTournamentStep(request, tournamentId),
+        checkMegaStep(request),
+        fetchPokemonStep(request),
+        createPlayerStep(request, tournamentId),
+        Effect.match({
+          onFailure: (error) => reply.status(error.statusCode).send({ error: error.message }),
+          onSuccess: (player) => {
+            request.log.info({ playerId: player.id, pokemonName: player.name, tournamentId }, 'Player added to tournament')
+            const response: PlayerResponse = {
+              id: player.id,
+              name: player.name,
+              tournamentId: player.tournamentId
+            }
+            return reply.status(201).send(response)
           }
-          return reply.status(201).send(response)
-        }
+        })
       )
-    )()
+    )
   })
 
   fastify.get<{ Params: { tournamentId: string }, Reply: Player[] | { error: string } }>('/tournaments/:tournamentId/players', async (request, reply) => {

@@ -1,6 +1,5 @@
 import * as Schema from "effect/Schema"
-import { Either as EffectEither } from "effect"
-import * as E from 'fp-ts/lib/Either'
+import { Either, pipe } from "effect"
 
 export const CreateTournamentValidation = Schema.Struct({
   name: Schema.String,
@@ -30,7 +29,7 @@ const formatIssueMessage = (issue: any, path?: string): string => {
   }
 }
 
-export const formatValidationErrors = (error: unknown): string => {
+const formatError = (error: unknown): string => {
   if (error && typeof error === 'object' && '_tag' in (error as any)) {
     return formatIssueMessage((error as any).issue || error)
   }
@@ -38,10 +37,8 @@ export const formatValidationErrors = (error: unknown): string => {
 }
 
 export const decode = <A>(schema: Schema.Schema<A>) =>
-  (input: unknown): E.Either<string, A> => {
-    const result = Schema.decodeUnknownEither(schema)(input)
-    return EffectEither.match(result, {
-      onLeft: (parseError) => E.left(formatValidationErrors(parseError)),
-      onRight: (value) => E.right(value)
-    })
-  }
+(input: unknown): Either.Either<A, string> =>
+    pipe(
+      Schema.decodeUnknownEither(schema)(input),
+      Either.mapLeft(formatError)
+    )
